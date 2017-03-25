@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 //For getting host IP address & MAC
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.util.Enumeration;
 import java.net.NetworkInterface;
 
@@ -247,6 +248,12 @@ public class Select {
 				try {
 					f1.forward(destination);
 				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (MalformedURLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}

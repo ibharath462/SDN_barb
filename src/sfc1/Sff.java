@@ -1,6 +1,8 @@
 package sfc1;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +51,7 @@ public class Sff {
 		
 	}
 	
-	public void forward(String destination) throws FileNotFoundException{
+	public void forward(String destination) throws MalformedURLException, IOException{
 		
 		String versionString = String.format("%8s", Integer.toBinaryString(nsh.get(0).byteValue() & 0xFF)).replace(' ', '0');
 		
@@ -88,7 +90,7 @@ public class Sff {
 					
 					Filtering f1 = new Filtering();
 					f1.filter(destination);
-					nsh.add(7,(byte) 0x03);
+					nsh.set(7,(byte) 0x03);
 					serviceIndex = String.format("%8s", Integer.toBinaryString(nsh.get(7).byteValue() & 0xFF)).replace(' ', '0');
 					serviceIndexInt = Integer.parseInt(serviceIndex,2);
 					
@@ -103,21 +105,20 @@ public class Sff {
 					//0xCO
 					String tt = t.substring(t.lastIndexOf(".")+1);
 					int t3 = Integer.parseInt(tt);
-					hexa(t3);
-					receivedBytes.add(26,(byte) 0xC0);
-					receivedBytes.add(27,(byte) 0x00);
-					receivedBytes.add(28,(byte) 0x00);
-					receivedBytes.add(29,(byte) t5);
+					receivedBytes.set(26,(byte) 0xC0);
+					receivedBytes.set(27,(byte) 0x00);
+					receivedBytes.set(28,(byte) 0x00);
+					receivedBytes.set(29,(byte) Integer.parseInt(Integer.toHexString(t3)));
 					
-					byte[] finBytes = new byte[payloadSize + receivedPacket.size()];
+					byte[] finBytes = new byte[receivedBytes.size()];
 					
-					for (int i = 0; i < nsh.size(); i++) {
-						finBytes[i] = receivedBytes.get(i).byteValue();
+					for (int i = 0; i < receivedBytes.size(); i++) {
+						finBytes[i] = receivedBytes.get(i);
 					}
 					
-					JMemory packet2 = new JMemoryPacket(JProtocol.ETHERNET_ID, finBytes);
+					JMemory modifiedNewPacket = new JMemoryPacket(JProtocol.ETHERNET_ID, finBytes);
 					
-					System.out.println(packet2.toHexdump());
+					System.out.println("Modified packet after NAT : \n" + modifiedNewPacket.toHexdump());
 				}
 				
 			}
