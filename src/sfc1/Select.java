@@ -77,7 +77,7 @@ public class Select {
 	public static NetworkInterface n;
 	public static Enumeration ee;
 	
-	static String destination;
+	static String destination,source;
 
   public static void main(String args[]) throws Exception {
     // chapter 2.2-4
@@ -147,7 +147,8 @@ public class Select {
 					System.out.println("IP type:\t" + ip.typeEnum());
 					System.out.println("IP src:\t-\t" + FormatUtils.ip(ip.source()));
 					System.out.println("IP dst:\t-\t" + FormatUtils.ip(ip.destination()));*/
-					destination = FormatUtils.ip(ip.destination());
+					destination = FormatUtils.ip(ip.destination());					
+					source = FormatUtils.ip(ip.source());
 					readdata = true;
 				}
 			}

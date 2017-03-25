@@ -6,8 +6,10 @@ import java.util.List;
 
 import org.jnetpcap.nio.JBuffer;
 import org.jnetpcap.nio.JMemory;
+import org.jnetpcap.packet.JMemoryPacket;
 import org.jnetpcap.packet.PcapPacket;
 import org.jnetpcap.packet.format.FormatUtils;
+import org.jnetpcap.protocol.JProtocol;
 import org.jnetpcap.protocol.network.Ip4;
 import org.jnetpcap.protocol.tcpip.Tcp;
 
@@ -19,15 +21,16 @@ public class Sff {
 	public static Tcp tcp = new Tcp();
 	public static Ip4 ip = new Ip4();
 	PcapPacket receivedPacket;
+	List<Byte> receivedBytes;
 	List<Byte> nsh;
 	
-	
+	static char t5;
 
 	public Sff(JMemory t , int size , PcapPacket tPacket){
 		
 		received = t;
 		
-		List<Byte> receivedBytes = new ArrayList<Byte>();
+		receivedBytes = new ArrayList<Byte>();
 		
 		payloadSize = size;
 		
@@ -93,8 +96,28 @@ public class Sff {
 				
 				if(serviceIndexInt == 3){
 					
+					NAT n1 = new NAT();
+					String modifiedSource = n1.start();
+					String t = modifiedSource.substring(0,modifiedSource.indexOf(":")-1);
+					System.out.println(t);
+					//0xCO
+					String tt = t.substring(t.lastIndexOf(".")+1);
+					int t3 = Integer.parseInt(tt);
+					hexa(t3);
+					receivedBytes.add(26,(byte) 0xC0);
+					receivedBytes.add(27,(byte) 0x00);
+					receivedBytes.add(28,(byte) 0x00);
+					receivedBytes.add(29,(byte) t5);
 					
+					byte[] finBytes = new byte[payloadSize + receivedPacket.size()];
 					
+					for (int i = 0; i < nsh.size(); i++) {
+						finBytes[i] = receivedBytes.get(i).byteValue();
+					}
+					
+					JMemory packet2 = new JMemoryPacket(JProtocol.ETHERNET_ID, finBytes);
+					
+					System.out.println(packet2.toHexdump());
 				}
 				
 			}
@@ -111,5 +134,12 @@ public class Sff {
 	public static void main(String args[]) throws Exception {
 	}
 	
+	public static void hexa(int num) {
+	    int m = 0;
+	    if( (m = num >>> 4) != 0 ) {
+	        hexa( m );
+	    }
+	    t5 = (char)((m=num & 0x0F)+(m<10 ? 48 : 55));
+	}
 	
 }
