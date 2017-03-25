@@ -76,6 +76,8 @@ public class Select {
 	public static Enumeration e;
 	public static NetworkInterface n;
 	public static Enumeration ee;
+	
+	static String destination;
 
   public static void main(String args[]) throws Exception {
     // chapter 2.2-4
@@ -145,7 +147,7 @@ public class Select {
 					System.out.println("IP type:\t" + ip.typeEnum());
 					System.out.println("IP src:\t-\t" + FormatUtils.ip(ip.source()));
 					System.out.println("IP dst:\t-\t" + FormatUtils.ip(ip.destination()));*/
-					
+					destination = FormatUtils.ip(ip.destination());
 					readdata = true;
 				}
 			}
@@ -178,8 +180,6 @@ public class Select {
 				    asBytes.add(new Byte(b));
 				}	
 				
-				/*asBytes.add(59, new Byte((byte)0x81));
-				asBytes.add(60, new Byte((byte)0x82));*/
 				
 				
 				byte[] 	finBytes = new byte[asBytes.size() + 8];
@@ -198,16 +198,21 @@ public class Select {
 				    finBytes[i] = asBytes.get(i).byteValue();
 				}
 				
+				
+				
 				//Adding NSH...
+				
 				
 				finBytes[i++] = (byte)0x40;
 				finBytes[i++] = (byte)0x06;
 				finBytes[i++] = (byte)0x01;
 				finBytes[i++] = (byte)0x01;
+				finBytes[i++] = (byte)0x02;
 				finBytes[i++] = (byte)0x00;
-				finBytes[i++] = (byte)0x03;
 				finBytes[i++] = (byte)0x01;
 				finBytes[i++] = (byte)0x01;
+				
+				
 				
 				
 				
@@ -215,9 +220,10 @@ public class Select {
 				
 				//Adding back the data.....
 				
-				for (int j=i , k =0; j<asBytes.size() + payloadSize - 2; i++,j++){
+				for (int j=i , k =0; k < payloadSize; k++,j++){
 					
 					finBytes[j] = data[k];
+					
 					
 				}
 				
@@ -233,11 +239,16 @@ public class Select {
 				
 				//SFF....
 				
-				Sff f1 = new Sff(packet2 , payloadSize);
+				Sff f1 = new Sff(packet2 , payloadSize , packet);
 				
 				//Forwarding....
 				
-				f1.forward();
+				try {
+					f1.forward(destination);
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
 				
 				
@@ -277,6 +288,11 @@ public class Select {
 		}
 		
 	};
+
+
+
+
+	
 
 	
 
