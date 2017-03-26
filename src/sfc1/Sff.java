@@ -88,9 +88,7 @@ public class Sff {
 			
 			int serviceIndexInt = Integer.parseInt(serviceIndex,2);
 			
-			System.out.println("Service Index :" + serviceIndexInt);
 			
-			System.out.println("Hop Count :" + hopCountInt);
 			
 			
 			if(hopCountInt == 2 && receivedPacket.hasHeader(tcp)){
@@ -98,15 +96,24 @@ public class Sff {
 				
 				if(serviceIndexInt == 1){
 					
+					System.out.println("Service Index :" + serviceIndexInt);
+					
+					System.out.println("Hop Count :" + hopCountInt);
+					
 					Filtering f1 = new Filtering();
 					f1.filter(destination);
 					nsh.set(7,(byte) 0x03);
 					serviceIndex = String.format("%8s", Integer.toBinaryString(nsh.get(7).byteValue() & 0xFF)).replace(' ', '0');
 					serviceIndexInt = Integer.parseInt(serviceIndex,2);
+					hopCountInt--;
 					
 				}
 				
 				if(serviceIndexInt == 3){
+					
+					System.out.println("Service Index :" + serviceIndexInt);
+					
+					System.out.println("Hop Count :" + hopCountInt);
 					
 					NAT n1 = new NAT();
 					String modifiedSource = n1.start();
@@ -134,6 +141,7 @@ public class Sff {
 					
 					System.out.println("Modified packet after NAT : \n" + modifiedNewPacket.toHexdump());
 				}
+				hopCountInt--;
 				
 			}
 			else if(hopCountInt == 1 && receivedPacket.hasHeader(udp)){
@@ -167,7 +175,7 @@ public class Sff {
 				
 				
 			}
-			hopCountInt--;
+
 		}
 			
 		
