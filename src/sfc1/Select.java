@@ -170,6 +170,8 @@ public class Select {
 				
 				int payloadSize = 0;
 				
+				System.out.println("TCP packet");
+				
 				if (pcappacket.hasHeader(payload) && 
 						readdata == true) {
 					payloadContent = payload.getPayload();
@@ -267,51 +269,112 @@ public class Select {
 				
 			} else if (pcappacket.hasHeader(udp) &&
 								 readdata == true) {
-				/*System.out.println("UDP src port:\t" + udp.source());
-				System.out.println("UDP dst port:\t" + udp.destination());*/
-			  
-			    }
-			//System.out.println(pcappackethandler);
-			
-			/*XmlFormatter out = new XmlFormatter(System.out);  
-		    try {
-				out.format(pcappacket);
-			} catch (IOException e) {
 				
-				e.printStackTrace();
-			}*/
-		    
-			/*if (pcappacket.hasHeader(payload) && 
-					readdata == true) {
-				payloadContent = payload.getPayload();
-				System.out.println("Payload:\n");
-				System.out.print(payload.size());
-			}*/
-			
-			/*if (readdata == true) System.out.println("-\t-\t-\t-\t-");
-			readdata = false;*/
-			
-			
+				int payloadSize = 0;
+				
+				
+				System.out.println("UDP packet..");
+				
+				String pay = null;
+				
+				if (pcappacket.hasHeader(payload) && 
+						readdata == true) {
+					payloadContent = payload.getPayload();
+					payloadSize = payload.size();
+					pay = payload.toHexdump().toString();
+					pay = pay.substring(pay.indexOf(":")+1);
+					pay = pay.replaceAll("^a-zA-Z", "");
+				}
+				
+				List<Byte> asBytes = new ArrayList<Byte>();
+				
+				for (byte b : packet.getByteArray(0, packet.size())){
+				    asBytes.add(new Byte(b));
+				}	
+				
+				
+				
+				byte[] 	finBytes = new byte[asBytes.size() + 8];
+				
+				byte[] 	data = new byte[payloadSize];
+				
+				
+				//Copying data bytes...
+				for (int i = 0 , j=asBytes.size() - payloadSize; i < payloadSize; i++,j++){
+				    data[i] = asBytes.get(j).byteValue();
+				}
+
+				//Just before NSH.....
+				int i;
+				for (i = 0; i < asBytes.size() - payloadSize; i++){
+				    finBytes[i] = asBytes.get(i).byteValue();
+				}
+				
+				
+				
+				//Adding NSH...
+				
+				
+				finBytes[i++] = (byte)0x80;
+				finBytes[i++] = (byte)0x06;
+				finBytes[i++] = (byte)0x01;
+				finBytes[i++] = (byte)0x02;
+				finBytes[i++] = (byte)0x01;
+				finBytes[i++] = (byte)0x00;
+				finBytes[i++] = (byte)0x02;
+				finBytes[i++] = (byte)0x02;
+				
+				
+				
+				
+				
+				
+				
+				//Adding back the data.....
+				
+				for (int j=i , k =0; k < payloadSize; k++,j++){
+					
+					finBytes[j] = data[k];
+					
+					
+				}
+				
+				
+				
+				
+				
+				JMemory packet2 = new JMemoryPacket(JProtocol.ETHERNET_ID, finBytes);
+				
+				
+				//SFF....
+				
+				Sff f1 = new Sff(packet2 , payloadSize , packet);
+				
+				//Forwarding....
+				
+				try {
+					f1.forward(pay);
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (MalformedURLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				//System.out.println("UDP packet...");
+
+
 		
+		}
+			
 		}
 		
 	};
-
-
-
-
 	
+	}
 
-	
-
-	
-	
-
-
-
-
-	
-
-
-}
 

@@ -18,7 +18,7 @@ public class NAT {
             switch(ch){
                 case 1:
                 	
-                    int ip=rand.nextInt(256);//for a local place with 256 private ip addressess
+                    int ip=rand.nextInt(255);//for a local place with 256 private ip addressess
                     int port=rand.nextInt(65536);//assume 65536 ports can be used to send to nat
                     String privateIp="192.0.0."+ip+":"+port;
                     nat.assignIp(privateIp);

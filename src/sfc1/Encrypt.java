@@ -13,7 +13,7 @@ public class Encrypt {
 		
 		int key = 4;
 		
-		plainText = plainText.replaceAll("[^a-zA-Z]", "");
+		plainText = plainText.replaceAll("[^a-zA-Z\\s]", "");
 		
 		plainText = plainText.toUpperCase();
 	    char[] plainTextChar = plainText.toCharArray();

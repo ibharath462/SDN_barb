@@ -9,11 +9,13 @@ import java.util.List;
 import org.jnetpcap.nio.JBuffer;
 import org.jnetpcap.nio.JMemory;
 import org.jnetpcap.packet.JMemoryPacket;
+import org.jnetpcap.packet.Payload;
 import org.jnetpcap.packet.PcapPacket;
 import org.jnetpcap.packet.format.FormatUtils;
 import org.jnetpcap.protocol.JProtocol;
 import org.jnetpcap.protocol.network.Ip4;
 import org.jnetpcap.protocol.tcpip.Tcp;
+import org.jnetpcap.protocol.tcpip.Udp;
 
 public class Sff {
 	
@@ -21,6 +23,7 @@ public class Sff {
 	JMemory received;
 	int payloadSize;
 	public static Tcp tcp = new Tcp();
+	public static Udp udp = new Udp();
 	public static Ip4 ip = new Ip4();
 	PcapPacket receivedPacket;
 	List<Byte> receivedBytes;
@@ -73,18 +76,25 @@ public class Sff {
 		
 		String hopCount = spiString.substring(0,8);
 		
+		System.out.println("Version : " + version + "\n" + "Length:" + length + "\n" + "MetaData type : " + mdType + "\n" + "Protocol : " + protocolString + "\n" + "Hop Limit : " + hopCount + "\nService Path Identifier : " + spiString);
+		
 		
 		int hopCountInt = Integer.parseInt(hopCount,2);
 		
 		while(hopCountInt > 0){
 			
 			
+			String serviceIndex = String.format("%8s", Integer.toBinaryString(nsh.get(7).byteValue() & 0xFF)).replace(' ', '0');
 			
-			if(hopCountInt == 2){
+			int serviceIndexInt = Integer.parseInt(serviceIndex,2);
+			
+			System.out.println("Service Index :" + serviceIndexInt);
+			
+			System.out.println("Hop Count :" + hopCountInt);
+			
+			
+			if(hopCountInt == 2 && receivedPacket.hasHeader(tcp)){
 				
-				String serviceIndex = String.format("%8s", Integer.toBinaryString(nsh.get(7).byteValue() & 0xFF)).replace(' ', '0');
-				
-				int serviceIndexInt = Integer.parseInt(serviceIndex,2);
 				
 				if(serviceIndexInt == 1){
 					
@@ -101,7 +111,8 @@ public class Sff {
 					NAT n1 = new NAT();
 					String modifiedSource = n1.start();
 					String t = modifiedSource.substring(0,modifiedSource.indexOf(":")-1);
-					System.out.println(t);
+					System.out.println("Network Address Translation:");
+					System.out.println("Modifid to public address : " + t);
 					//0xCO
 					String tt = t.substring(t.lastIndexOf(".")+1);
 					int t3 = Integer.parseInt(tt);
@@ -122,7 +133,10 @@ public class Sff {
 				}
 				
 			}
-			else if(hopCountInt == 1){
+			else if(hopCountInt == 1 && receivedPacket.hasHeader(udp)){
+				
+				Encrypt e = new Encrypt();
+				e.encrypt(destination);
 				
 			}
 			hopCountInt--;
@@ -135,12 +149,5 @@ public class Sff {
 	public static void main(String args[]) throws Exception {
 	}
 	
-	public static void hexa(int num) {
-	    int m = 0;
-	    if( (m = num >>> 4) != 0 ) {
-	        hexa( m );
-	    }
-	    t5 = (char)((m=num & 0x0F)+(m<10 ? 48 : 55));
-	}
 	
 }
