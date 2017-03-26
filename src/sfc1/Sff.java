@@ -136,7 +136,32 @@ public class Sff {
 			else if(hopCountInt == 1 && receivedPacket.hasHeader(udp)){
 				
 				Encrypt e = new Encrypt();
-				e.encrypt(destination);
+				
+				ArrayList<String> encoded = new ArrayList<String>();
+				
+				System.out.println("\nAfter encryption...");
+				
+				byte[] finBytes = new byte[receivedBytes.size()];
+				
+				for(int i=0; i < receivedBytes.size() - payloadSize - 8 ; i++){
+					finBytes[i] = receivedBytes.get(i);
+				}
+				
+				JMemory modifiedNewPacket = new JMemoryPacket(JProtocol.ETHERNET_ID, finBytes);
+				
+				System.out.print(modifiedNewPacket + "");
+				
+				encoded = e.encrypt(destination);
+				
+				
+				for(int i=0; i < encoded.size(); i++){
+				
+					String t = encoded.get(i);
+					System.out.print(t + " ");
+					
+				}
+				
+				
 				
 			}
 			hopCountInt--;

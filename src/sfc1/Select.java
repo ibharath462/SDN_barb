@@ -283,7 +283,7 @@ public class Select {
 					payloadSize = payload.size();
 					pay = payload.toHexdump().toString();
 					pay = pay.substring(pay.indexOf(":")+1);
-					pay = pay.replaceAll("^a-zA-Z", "");
+					
 				}
 				
 				List<Byte> asBytes = new ArrayList<Byte>();
