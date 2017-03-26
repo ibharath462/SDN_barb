@@ -152,17 +152,18 @@ public class Sff {
 				
 				System.out.println("\nAfter encryption...");
 				
-				byte[] finBytes = new byte[receivedBytes.size()];
+				byte[] finBytes = new byte[receivedBytes.size() - payloadSize];
 				
-				for(int i=0; i < receivedBytes.size() - payloadSize - 8 ; i++){
+				for(int i=0; i < receivedBytes.size() - payloadSize; i++){
 					finBytes[i] = receivedBytes.get(i);
 				}
 				
 				JMemory modifiedNewPacket = new JMemoryPacket(JProtocol.ETHERNET_ID, finBytes);
 				
-				System.out.print(modifiedNewPacket + "");
+				System.out.print(modifiedNewPacket.toHexdump());
 				
 				encoded = e.encrypt(destination);
+			
 				
 				
 				for(int i=0; i < encoded.size(); i++){
@@ -172,7 +173,7 @@ public class Sff {
 					
 				}
 				
-				
+				hopCountInt--;
 				
 			}
 

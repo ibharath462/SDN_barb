@@ -14,7 +14,7 @@ public class Encrypt {
 	
 	public ArrayList<String> encrypt(String plainText){
 		
-		int key = 4;
+		int key = 1;
 				
 		int length = 0;
 		
@@ -50,7 +50,7 @@ public class Encrypt {
 		
 		
 	    for(int i=0;i<plainTextChar.length;i++) {
-	        plainTextChar[i] = (char)(((int)plainTextChar[i]+key-65)%26 + 65);
+	    	plainTextChar[i] = (char)(((int)plainTextChar[i]+key-97)%26 + 97);
 	    }
 	    
 		//System.out.println(String.valueOf(plainTextChar) + " , " + length);
