@@ -28,6 +28,7 @@ public class Sff {
 	PcapPacket receivedPacket;
 	List<Byte> receivedBytes;
 	List<Byte> nsh;
+	ArrayList<String> encoded = new ArrayList<String>();
 	
 	static char t5;
 
@@ -139,7 +140,31 @@ public class Sff {
 					
 					JMemory modifiedNewPacket = new JMemoryPacket(JProtocol.ETHERNET_ID, finBytes);
 					
-					System.out.println("Modified packet after NAT : \n" + modifiedNewPacket.toHexdump());
+					System.out.println("\nModified packet after NAT : \n" + modifiedNewPacket.toHexdump());
+					
+					//Removal of NSH....
+					
+					List<Byte> t2 = new ArrayList<Byte>();
+					
+					for(int i = 0; i<receivedBytes.size() - payloadSize - 8; i++){
+							t2.add(receivedBytes.get(i));
+					}
+					
+					for(int i = receivedBytes.size() - payloadSize - 1; i<receivedBytes.size(); i++){
+						t2.add(receivedBytes.get(i));
+					}
+
+					
+					byte[] finBytes2 = new byte[receivedBytes.size()];
+					
+					for(int i=0; i < t2.size(); i++){
+						finBytes2[i] = t2.get(i);
+					}
+					
+					JMemory sendPacket = new JMemoryPacket(JProtocol.ETHERNET_ID, finBytes2);
+					
+					System.out.print("\nFinal Packets after removing NSH : " + sendPacket.toHexdump());
+					
 				}
 				hopCountInt--;
 				
@@ -148,7 +173,6 @@ public class Sff {
 				
 				Encrypt e = new Encrypt();
 				
-				ArrayList<String> encoded = new ArrayList<String>();
 				
 				System.out.println("\nAfter encryption...");
 				
@@ -173,12 +197,40 @@ public class Sff {
 					
 				}
 				
+				//Removal of NSH....
+				
+				List<Byte> t = new ArrayList<Byte>();
+				
+				for(int i = 0; i<=receivedBytes.size() - payloadSize - 8; i++){
+						t.add(receivedBytes.get(i));
+				}
+				
+				byte[] finBytes2 = new byte[receivedBytes.size() - 8];
+				
+				for(int i=0; i < t.size(); i++){
+					finBytes2[i] = t.get(i);
+				}
+				
+				JMemory sendPacket = new JMemoryPacket(JProtocol.ETHERNET_ID, finBytes2);
+				
+				System.out.print("\nFinal Packets after removing NSH : " + sendPacket.toHexdump());
+				
+				for(int i=0; i < encoded.size(); i++){
+					
+					String tS = encoded.get(i);
+					System.out.print(tS + " ");
+					
+				}
+				
 				hopCountInt--;
 				
 			}
 
 		}
-			
+		
+		
+
+		
 		
 	}
 	
