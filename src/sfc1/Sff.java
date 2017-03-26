@@ -116,6 +116,9 @@ public class Sff {
 					//0xCO
 					String tt = t.substring(t.lastIndexOf(".")+1);
 					int t3 = Integer.parseInt(tt);
+					if(t3 > 9){
+						t3 += 6;
+					}
 					receivedBytes.set(26,(byte) 0xC0);
 					receivedBytes.set(27,(byte) 0x00);
 					receivedBytes.set(28,(byte) 0x00);

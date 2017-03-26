@@ -138,6 +138,8 @@ public class Select {
 			
 			PcapPacket packet = pcappacket;
 			
+			System.out.println("Original packet is : \n" + packet.toHexdump());
+			
 			
 			if (pcappacket.hasHeader(ip)) {
 				
