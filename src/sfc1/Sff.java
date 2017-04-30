@@ -138,7 +138,10 @@ public class Sff {
 					}
 					
 					Filtering f1 = new Filtering();
-					f1.filter(destination);
+					boolean isBlocked = f1.filter(destination);
+					if(isBlocked){
+						break;
+					}
 					nsh.set(7,(byte) 0x03);
 					serviceIndex = String.format("%8s", Integer.toBinaryString(nsh.get(7).byteValue() & 0xFF)).replace(' ', '0');
 					serviceIndexInt = Integer.parseInt(serviceIndex,2);

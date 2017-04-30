@@ -70,7 +70,7 @@ public class Filtering {
     	        
     }
     
-	public void filter(String destination) throws MalformedURLException, IOException {
+	public boolean filter(String destination) throws MalformedURLException, IOException {
 		
 		System.out.println("Filtering SF....");
 		logWrite += "\nFiltering SF....";
@@ -85,7 +85,7 @@ public class Filtering {
         if (f.isBlocked()){
             System.out.println("Access Denied to:" + destination);
             logWrite += "\nAccess Denied to:" + destination;
-            
+            return true;
         }
         else
         {
@@ -118,7 +118,7 @@ public class Filtering {
 		    System.err.println("IOException: " + ioe.getMessage());
 		}
 		// TODO Auto-generated method stub
-        return;
+        return false;
 		
 	}
 
