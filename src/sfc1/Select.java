@@ -13,6 +13,7 @@ import org.jnetpcap.protocol.network.Ip4;
 
 import java.util.ArrayList;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.text.DateFormat;
@@ -21,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 //For getting host IP address & MAC
@@ -61,11 +63,7 @@ public class Select {
 	public static Ethernet eth = new Ethernet();
 	public static Tcp tcp = new Tcp();
 	public static Udp udp = new Udp();
-	/*	public static Rip rip = new Rip() {
-			void printheader() {
-			System.out.println(rip.getHeader());
-			}
-			}; */
+	
 	
 	public static Arp arp = new Arp();
 	public static Payload payload = new Payload();
@@ -139,6 +137,22 @@ public class Select {
 			PcapPacket packet = pcappacket;
 			
 			System.out.println("Original packet is : \n" + packet.toHexdump());
+			
+			String filename= "/home/bharath/MyLog.log";
+		    Calendar cal = Calendar.getInstance();
+		    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+			
+			try
+			{
+				FileWriter fw = new FileWriter(filename,true); //the true will append the new data
+			    fw.write(sdf.format(cal.getTime()) + "\n\n\n\nNew Entry in the Log\n");//appends the string to the file
+			    fw.write(sdf.format(cal.getTime()) + "\nOriginal packet is : \n" + packet.toHexdump());//appends the string to the file
+			    fw.close();
+			}
+			catch(IOException ioe)
+			{
+			    System.err.println("IOException: " + ioe.getMessage());
+			}
 			
 			
 			if (pcappacket.hasHeader(ip)) {

@@ -1,6 +1,8 @@
 package sfc1;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Scanner;
 import java.net.*;
 import java.awt.List;
@@ -13,6 +15,10 @@ public class Filtering {
 	static Scanner scan;
     static Scanner blocked;
     static String inputPage,hostname,address;
+    String filename= "/home/bharath/MyLog.log";
+    String logWrite;
+    Calendar cal = Calendar.getInstance();
+    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
     
     public void getUrl()
     {
@@ -33,6 +39,8 @@ public class Filtering {
         	 else
         	 	 hostname = "www." + hostname;
         	 System.out.println("Resolved hostname:" + hostname);
+        	 logWrite += "\nResolved hostname:" + hostname;
+        	 
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -65,19 +73,24 @@ public class Filtering {
 	public void filter(String destination) throws MalformedURLException, IOException {
 		
 		System.out.println("Filtering SF....");
+		logWrite += "\nFiltering SF....";
 		
     	Filtering f = new Filtering();
     	address = destination;
     	System.out.println("Destination address : " + address);
+    	logWrite += "\nDestination address : " + address;
         scan = new Scanner(System.in);
         blocked=new Scanner(new FileReader("src/sfc1/blocked.txt"));
         f.getUrl();
         if (f.isBlocked()){
             System.out.println("Access Denied to:" + destination);
+            logWrite += "\nAccess Denied to:" + destination;
+            
         }
         else
         {
             System.out.println(destination + " is allowed..");
+            logWrite += "\n" + destination + " is allowed..";
             URL url = new URL("http://" + hostname);
             URLConnection spoof = url.openConnection();
 
@@ -92,7 +105,18 @@ public class Filtering {
                finalHTML += "\n";
             }	
             System.out.println(finalHTML);
+            logWrite += "\n" + finalHTML;
         }
+        try
+		{
+			FileWriter fw = new FileWriter(filename,true); //the true will append the new data
+		    fw.write(logWrite);
+		    fw.close();
+		}
+		catch(IOException ioe)
+		{
+		    System.err.println("IOException: " + ioe.getMessage());
+		}
 		// TODO Auto-generated method stub
         return;
 		

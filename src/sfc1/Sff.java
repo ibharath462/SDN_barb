@@ -1,9 +1,12 @@
 package sfc1;
 
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import org.jnetpcap.nio.JBuffer;
@@ -20,6 +23,12 @@ import org.jnetpcap.protocol.tcpip.Udp;
 public class Sff {
 	
 	
+	
+	String filename= "/home/bharath/MyLog.log";
+    Calendar cal = Calendar.getInstance();
+    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+    
+    
 	JMemory received;
 	int payloadSize;
 	public static Tcp tcp = new Tcp();
@@ -79,8 +88,20 @@ public class Sff {
 		
 		System.out.println("Version : " + version + "\n" + "Length:" + length + "\n" + "MetaData type : " + mdType + "\n" + "Protocol : " + protocolString + "\n" + "Hop Limit : " + hopCount + "\nService Path Identifier : " + spiString);
 		
+		try
+		{
+			FileWriter fw = new FileWriter(filename,true); //the true will append the new data
+		    fw.write(sdf.format(cal.getTime()) + "\nVersion : " + version + "\n" + "Length:" + length + "\n" + "MetaData type : " + mdType + "\n" + "Protocol : " + protocolString + "\n" + "Hop Limit : " + hopCount + "\nService Path Identifier : " + spiString);
+		    fw.close();
+		}
+		catch(IOException ioe)
+		{
+		    System.err.println("IOException: " + ioe.getMessage());
+		}
 		
 		int hopCountInt = Integer.parseInt(hopCount,2);
+		
+		String logWrite;
 		
 		while(hopCountInt > 0){
 			
@@ -99,7 +120,22 @@ public class Sff {
 					
 					System.out.println("Service Index :" + serviceIndexInt);
 					
+					logWrite = "\nService Index :" + serviceIndexInt;
+					
 					System.out.println("Hop Count :" + hopCountInt);
+					
+					logWrite += "\nHop Count :" + hopCountInt;
+					
+					try
+					{
+						FileWriter fw = new FileWriter(filename,true); //the true will append the new data
+					    fw.write(sdf.format(cal.getTime()) + logWrite);
+					    fw.close();
+					}
+					catch(IOException ioe)
+					{
+					    System.err.println("IOException: " + ioe.getMessage());
+					}
 					
 					Filtering f1 = new Filtering();
 					f1.filter(destination);
@@ -108,19 +144,26 @@ public class Sff {
 					serviceIndexInt = Integer.parseInt(serviceIndex,2);
 					hopCountInt--;
 					
+					
+					
 				}
 				
 				if(serviceIndexInt == 3){
 					
 					System.out.println("Service Index :" + serviceIndexInt);
+					logWrite = "\nService Index :" + serviceIndexInt;
 					
 					System.out.println("Hop Count :" + hopCountInt);
+					logWrite += "\nHop Count :" + hopCountInt;
 					
 					NAT n1 = new NAT();
 					String modifiedSource = n1.start();
 					String t = modifiedSource.substring(0,modifiedSource.indexOf(":")-1);
+					logWrite = "\n";
 					System.out.println("Network Address Translation:");
+					logWrite += "\nNetwork Address Translation:";
 					System.out.println("Modifid to public address : " + t);
+					logWrite += "\nModifid to public address : " + t;
 					//0xCO
 					String tt = t.substring(t.lastIndexOf(".")+1);
 					int t3 = Integer.parseInt(tt);
@@ -141,6 +184,8 @@ public class Sff {
 					JMemory modifiedNewPacket = new JMemoryPacket(JProtocol.ETHERNET_ID, finBytes);
 					
 					System.out.println("\nModified packet after NAT : \n" + modifiedNewPacket.toHexdump());
+					
+					logWrite += "\nModified packet after NAT : \n" + modifiedNewPacket.toHexdump();
 					
 					//Removal of NSH....
 					
@@ -165,6 +210,19 @@ public class Sff {
 					
 					System.out.print("\nFinal Packets after removing NSH : " + sendPacket.toHexdump());
 					
+					logWrite += "\nFinal Packets after removing NSH : " + sendPacket.toHexdump();
+					
+					try
+					{
+						FileWriter fw = new FileWriter(filename,true); //the true will append the new data
+					    fw.write(sdf.format(cal.getTime()) + logWrite);
+					    fw.close();
+					}
+					catch(IOException ioe)
+					{
+					    System.err.println("IOException: " + ioe.getMessage());
+					}
+					
 				}
 				hopCountInt--;
 				
@@ -173,8 +231,11 @@ public class Sff {
 				
 				Encrypt e = new Encrypt();
 				
+				logWrite = "\n";
 				
 				System.out.println("\nAfter encryption...");
+				
+				logWrite += "\nAfter encryption...";
 				
 				byte[] finBytes = new byte[receivedBytes.size() - payloadSize];
 				
@@ -186,6 +247,8 @@ public class Sff {
 				
 				System.out.print(modifiedNewPacket.toHexdump());
 				
+				logWrite += "\n" + modifiedNewPacket.toHexdump();
+				
 				encoded = e.encrypt(destination);
 			
 				
@@ -194,6 +257,7 @@ public class Sff {
 				
 					String t = encoded.get(i);
 					System.out.print(t + " ");
+					logWrite += t + " ";
 					
 				}
 				
@@ -215,11 +279,25 @@ public class Sff {
 				
 				System.out.print("\nFinal Packets after removing NSH : " + sendPacket.toHexdump());
 				
+				logWrite += "\nFinal Packets after removing NSH : " + sendPacket.toHexdump();
+				
 				for(int i=0; i < encoded.size(); i++){
 					
 					String tS = encoded.get(i);
 					System.out.print(tS + " ");
+					logWrite += tS + " ";
 					
+				}
+				
+				try
+				{
+					FileWriter fw = new FileWriter(filename,true); //the true will append the new data
+				    fw.write(sdf.format(cal.getTime()) + logWrite);
+				    fw.close();
+				}
+				catch(IOException ioe)
+				{
+				    System.err.println("IOException: " + ioe.getMessage());
 				}
 				
 				hopCountInt--;
